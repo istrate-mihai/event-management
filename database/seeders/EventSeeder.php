@@ -18,9 +18,11 @@ class EventSeeder extends Seeder
             $user = $users->random();
 
             \App\Models\Event::create([
-                'user_id' => $user->id,
+                'user_id'    => $user->id,
+                'name'       => fake()->sentence(3),
+                'start_time' => fake()->dateTimeBetween('now', '+1 month'),
+                'end_time'   => fake()->dateTimeBetween('+1 month', '+2 months'),
             ]);
-
         }
     }
 }

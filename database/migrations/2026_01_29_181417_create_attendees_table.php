@@ -3,8 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use \App\Models\User;
-use \App\Models\Event;
+use App\Models\User;
+use App\Models\Event;
 
 return new class extends Migration
 {
@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('atendees', function (Blueprint $table) {
+        Schema::create('attendees', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class);
             $table->foreignIdFor(Event::class);
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('atendees');
+        Schema::dropIfExists('attendees');
     }
 };

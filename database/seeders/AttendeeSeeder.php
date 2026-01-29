@@ -20,7 +20,7 @@ class AttendeeSeeder extends Seeder
 
             foreach($eventsToAttend as $event) {
                 \App\Models\Attendee::create([
-                    'user_id' => $user->id,
+                    'user_id'  => $user->id,
                     'event_id' => $event->id,
                 ]);
             }
