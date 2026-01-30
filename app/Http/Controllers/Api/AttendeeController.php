@@ -4,15 +4,29 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use \App\Http\Controllers\Controller;
+use \App\Models\Event;
+use \App\Http\Resources\AttendeeResource;
+use \App\Models\Attendee;
+use \App\Http\Traits\CanLoadRelations;
 
 class AttendeeController extends Controller
 {
+    use CanLoadRelations;
+
+    private array $relations = ['user'];
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Event $event)
     {
-        //
+        $attendees = $this->loadRelationships(
+            $event->attendees()->latest()
+        );
+
+        return AttendeeResource::collection(
+            $attendees->paginate()
+        );
     }
 
     /**
@@ -26,17 +40,25 @@ class AttendeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Event $event)
     {
-        //
+        $attendee = $this->loadRelationships(
+        $event->attendees()->create([
+                'user_id' => 1,
+            ])
+        );
+
+        return new AttendeeResource($attendee);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Event $event, Attendee $attendee)
     {
-        //
+        return new AttendeeResource(
+            $this->loadRelationships($attendee)
+        );
     }
 
     /**
@@ -58,8 +80,10 @@ class AttendeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $event, Attendee $attendee)
     {
-        //
+        $attendee->delete();
+
+        return response(status: 204);
     }
 }
