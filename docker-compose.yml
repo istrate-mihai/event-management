@@ -2,16 +2,40 @@ version: "3.9"
 services:
     mysql:
         image: mariadb:10.8.3
-        # Uncomment below when on Mac M1
-        # platform: linux/arm64/v8
         command: --default-authentication-plugin=mysql_native_password
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: root1996
+            MYSQL_DATABASE: event_management # Add your database name
         ports:
             - 3306:3306
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - app-network
+
     adminer:
         image: adminer
         restart: always
         ports:
             - 8080:8080
+        networks:
+            - app-network
+
+    mailpit:
+        image: axllent/mailpit
+        container_name: mailpit
+        restart: unless-stopped
+        ports:
+            - "1025:1025" # SMTP port for sending emails
+            - "8025:8025" # Web interface port
+        networks:
+            - app-network
+
+volumes:
+    mysql_data:
+
+
+networks:
+    app-network:
+        driver: bridge

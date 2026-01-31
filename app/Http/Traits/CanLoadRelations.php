@@ -39,3 +39,4 @@ trait CanLoadRelations
         return in_array($relation, $relations);
     }
 }
+

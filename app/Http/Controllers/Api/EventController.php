@@ -7,6 +7,7 @@ use \App\Http\Controllers\Controller;
 use \App\Models\Event;
 use \App\Http\Resources\EventResource;
 use \App\Http\Traits\CanLoadRelations;
+use Illuminate\Support\Facades\Gates;
 
 class EventController extends Controller
 {
@@ -14,12 +15,21 @@ class EventController extends Controller
 
     private array $relations = ['user', 'attendees', 'attendees.user'];
 
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')
+            ->only(['store', 'update', 'destroy']);
+
+        $this->authorizeResource(Event::class, 'event');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $query = $this->loadRelations(Event::query());
+        $query = $this->loadRelationships(Event::query());
 
         return EventResource::collection(
             $query->latest()->paginate()
@@ -60,7 +70,7 @@ class EventController extends Controller
                 'start_time'  => 'required|date',
                 'end_time'    => 'required|date|after:start_time',
             ]),
-            'user_id' => 1,
+            'user_id' => $request->user()->id,
         ]);
 
         return new EventResource($this->loadRelationships($event));
@@ -72,7 +82,10 @@ class EventController extends Controller
     public function show(Event $event)
     {
         $event->load('user', 'attendees');
-        return new EventResource($this->loadRelationships($event));
+
+        return new EventResource(
+            $this->loadRelationships($event)
+        );
     }
 
     /**
